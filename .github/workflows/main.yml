@@ -1,0 +1,51 @@
+from pathlib import Path
+import zipfile
+
+zip_path = Path("/mnt/data/apkforge-ai (2).zip")
+out_path = Path("/mnt/data/main.yml")
+
+with zipfile.ZipFile(zip_path) as z:
+    names = z.namelist()
+    # Inspect package scripts if available, so the workflow matches the project.
+    package_files = [n for n in names if n.endswith("package.json")]
+    package_text = ""
+    if package_files:
+        package_text = z.read(package_files[0]).decode("utf-8", errors="replace")
+
+out_path.write_text("""name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: dist
+""", encoding="utf-8")
+print(out_path)
