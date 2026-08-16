@@ -1,0 +1,6 @@
+{
+  "appId": "com.apkforge.studio",
+  "appName": "APKForge Studio",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
