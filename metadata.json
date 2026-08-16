@@ -1,6 +1,0 @@
-{
-  "name": "APKForge AI",
-  "description": "Production-grade Android application and studio for APK analysis, AI code assistance, Smali/Manifest editing, and APK build workflow.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
