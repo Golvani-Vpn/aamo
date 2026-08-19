@@ -1,0 +1,1 @@
+{"name":"ai-android-app-builder","private":true,"version":"2.0.0","description":"GitHub-native, backendless AI Android app builder","license":"MIT","scripts":{"build":"npm run build --workspace frontend"},"workspaces":["frontend"]}
