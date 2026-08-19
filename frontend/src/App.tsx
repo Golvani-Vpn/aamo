@@ -123,13 +123,29 @@ function App() {
   const [files, setFiles] = useState<FileMap>(initialTemplate)
   const [image, setImage] = useState('')
   const [connected, setConnected] = useState(false)
+  const [aiConnected, setAiConnected] = useState(false)
   const [lastRun, setLastRun] = useState<any>(null)
 
-  const canSend = useMemo(() => Boolean(aiKey.trim() && input.trim() && !busy), [aiKey, input, busy])
+  const canSend = useMemo(() => Boolean(aiConnected && input.trim() && !busy), [aiConnected, input, busy])
   const canGitHub = useMemo(() => Boolean(ghToken.trim() && owner.trim() && repo.trim()), [ghToken, owner, repo])
 
   const saveSettings = () => {
     setStatus('Ready — settings are active for this browser session. Keys are never written into project files.')
+  }
+
+
+  const connectAI = async () => {
+    if (!aiKey.trim()) { setStatus('Enter AI API key first.'); return }
+    setBusy(true)
+    try {
+      const test = await callAI(provider, aiKey.trim(), model, [{ role: 'user', content: 'Reply only: OK' }])
+      if (!test) throw new Error('No response from AI')
+      setAiConnected(true)
+      setStatus(`AI connected successfully: ${provider}`)
+    } catch (error: any) {
+      setAiConnected(false)
+      setStatus(`AI connection failed: ${error.message}`)
+    } finally { setBusy(false) }
   }
 
   const connectGitHub = async () => {
@@ -242,6 +258,7 @@ function App() {
           <label>API Key
             <input type="password" value={aiKey} onChange={(event) => setAiKey(event.target.value)} placeholder={`Paste your ${provider === 'openai' ? 'OpenAI' : provider} key`} autoComplete="off" />
           </label>
+          <div className="row"><button className="secondary" onClick={connectAI} disabled={busy || !aiKey.trim()}>Connect AI</button><span>{aiConnected ? '✓ AI connected' : 'Not connected'}</span></div>
           <div className="hint">Your key is used directly by this browser. It is never sent to this project server and never committed to GitHub.</div>
 
           <div className="panel-title section-gap"><span>2</span><div><h3>GitHub connection</h3><small>Use a fine-grained token for your repository.</small></div></div>
